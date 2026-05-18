@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>heather.quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0b16;
+    --surface: #1a1528;
+    --border: #3a2f5a;
+    --text: #f0e6ff;
+    --muted: #9b8ec4;
+    --accent: #c084fc;
+    --accent2: #f0abfc;
+    --gold: #fcd34d;
+    --pink: #f472b6;
+    --teal: #5eead4;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--d, 3s) var(--delay, 0s) infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; }
+    50% { opacity: var(--max-op, 0.6); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    width: 100%;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .header .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scene {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scene-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+
+  .scene-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  .scene-text em {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .scene-text strong {
+    color: var(--accent2);
+    font-style: normal;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .choice-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 0.85rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent);
+    background: rgba(192, 132, 252, 0.08);
+    color: var(--accent2);
+    transform: translateX(4px);
+  }
+
+  .choice-btn:active {
+    transform: translateX(2px) scale(0.99);
+  }
+
+  .choice-btn .arrow {
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  .ending-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .ending-badge.good {
+    background: rgba(240, 171, 252, 0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(240, 171, 252, 0.3);
+  }
+
+  .ending-badge.best {
+    background: rgba(252, 211, 77, 0.15);
+    color: var(--gold);
+    border: 1px solid rgba(252, 211, 77, 0.3);
+  }
+
+  .ending-badge.chaos {
+    background: rgba(244, 114, 182, 0.15);
+    color: var(--pink);
+    border: 1px solid rgba(244, 114, 182, 0.3);
+  }
+
+  .restart-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 0.6rem 1.25rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .restart-btn:hover {
+    color: var(--text);
+    border-color: var(--muted);
+  }
+
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .progress-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .progress-dot.active {
+    background: var(--accent);
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 11px;
+    color: var(--muted);
+    animation: fadeIn 1s 0.5s ease both;
+    opacity: 0;
+  }
+
+  .footer span {
+    color: var(--pink);
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="header">
+    <p class="eyebrow">a birthday adventure</p>
+    <h1>Heather's Quest</h1>
+    <p class="subtitle">an interactive journey through your very important day</p>
+  </div>
+
+  <div class="progress">
+    <span>progress</span>
+    <div class="progress-dots" id="dots">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+
+  <div class="scene" id="scene-box"></div>
+
+  <div class="footer">made with love by craig <span>&#9829;</span></div>
+</div>
+
+<script>
+const SCENES = {
+  start: {
+    tag: "chapter one - the awakening",
+    text: `It is your birthday. The room is quiet. Shoto is already pressed against your legs, breathing in that ridiculous dog way that somehow sounds like snoring and contentment at the same time.\n\nYour phone is right there.\n\nYou already know what you're going to do. You've known since before you were even fully awake. It calls to you. It always calls to you.`,
+    choices: [
+      { label: "Open the bird app. Obviously. First thing. Every day. Always.", next: "birdapp" },
+      { label: "Resist. Just for one birthday morning. Lay here like a normal person.", next: "resist" }
+    ]
+  },
+  resist: {
+    tag: "chapter one - hubris",
+    text: `You put the phone face-down. You breathe. You stare at the ceiling.\n\nShoto shifts. You look at him. He looks at you.\n\nThirty seconds pass.\n\nYou pick up the phone.`,
+    choices: [
+      { label: "Open the bird app.", next: "birdapp" }
+    ]
+  },
+  birdapp: {
+    tag: "chapter one - the daily ritual",
+    text: `You open Finch. Your bird has needs. Your bird <em>always</em> has needs. You tend to them with the focus of someone managing a small but emotionally demanding portfolio.\n\nCraig is still asleep. Shoto has relocated to directly on top of your feet, which is illegal but also not something you're prepared to fight.\n\nYou finish your bird duties. You set the phone down. You feel, inexplicably, like you've accomplished something.\n\nShoto looks up at you. Today he is wearing the little outfit. You put it on him last night because you knew it would make the morning better, and you were right, and you are always right about Shoto.`,
+    choices: [
+      { label: "Take approximately forty pictures of him in the outfit.", next: "shotopics" },
+      { label: "Simply admire him for a moment. A serene birthday moment.", next: "shotoadmire" }
+    ]
+  },
+  shotopics: {
+    tag: "chapter one - documentation",
+    text: `Good. Correct. He deserves to be documented. Every angle. He sits for exactly three of them before getting distracted by something that doesn't exist, but those three photos are <em>extraordinary</em>.\n\nYou scroll back through them. Your heart does something embarrassing.\n\nShoto was adopted from Leon County Humane Society however many years ago and has not stopped being the best decision you've ever made, not even once, not for a single day.`,
+    choices: [
+      { label: "Okay. Get up. Starbucks. The routine calls.", next: "starbucks_depart" }
+    ]
+  },
+  shotoadmire: {
+    tag: "chapter one - the quiet ones",
+    text: `You look at him. He looks at you. His tail moves once, slowly, like a metronome set to 'content.'\n\nHe has no idea it's your birthday. He doesn't care. He loves you with the same unhinged totality every single day regardless of the occasion.\n\nHonestly? That's the correct approach to love.`,
+    choices: [
+      { label: "Get up. Starbucks awaits. It always awaits.", next: "starbucks_depart" }
+    ]
+  },
+  starbucks_depart: {
+    tag: "chapter two - the daily pilgrimage",
+    text: `You grab your keys. This is not a decision. This is a biological process. Your body does it automatically, like breathing, like blinking, like opening the bird app.\n\nCraig is still in bed. You could ask him if he wants anything.\n\nYou already know what he'll say.`,
+    choices: [
+      { label: "Ask anyway. Out of tradition.", next: "ask_craig_sbux" },
+      { label: "Don't ask. You know. You've always known.", next: "tony" }
+    ]
+  },
+  ask_craig_sbux: {
+    tag: "chapter two - a familiar exchange",
+    text: `"You want Starbucks?"\n\nCraig makes a noise that is technically a response but not really an answer.\n\n"I'm fine," he says, from somewhere under a pillow.\n\nYou stand there for a moment.\n\n"I do get it on the weekends sometimes," he adds, unprompted, as though this has been weighing on him.\n\nYou leave.`,
+    choices: [
+      { label: "Head out. Wave to Tony.", next: "tony" }
+    ]
+  },
+  tony: {
+    tag: "chapter two - neighborhood lore",
+    text: `Outside, Tony is in his usual spot, doing his usual thing. He gives you a wave. You give him a wave back. He has a joint. This is normal. This is just Tony. Tony has been doing Tony since before you moved in and will presumably continue doing Tony indefinitely.\n\nThere's something kind of beautiful about a person who is just fully, consistently, unapologetically themselves every single day.\n\nYou get in the car. Starbucks is calling.`,
+    choices: [
+      { label: "Drive. Order your thing. The birthday order.", next: "starbucks_arrive" }
+    ]
+  },
+  starbucks_arrive: {
+    tag: "chapter two - the temple",
+    text: `You get your drink. It is correct. It is always correct when you order it because you know exactly what you want, which is a skill more people should have.\n\nYou sit for a second. Or maybe you're already at the drive-through. Either way there is a moment here - a still point, just you and your drink and your birthday morning and nobody needing anything from you for like four consecutive minutes.\n\nYour phone buzzes. It is, in some capacity, work-adjacent.\n\nYou look at it. You know you're going to look at it. You've always known you're going to look at it.`,
+    choices: [
+      { label: "It's your birthday. You look at it anyway. You're built different.", next: "workaholic" },
+      { label: "Put the phone face-down. You did the bird app already. You're off the clock.", next: "phone_down" }
+    ]
+  },
+  workaholic: {
+    tag: "chapter two - the condition",
+    text: `You look at it. You respond to something. You maybe send a quick email. It's fine. It'll take two seconds.\n\nFourteen minutes pass.\n\nYou're not a workaholic, you're just <em>thorough</em>, which is a completely different thing and Craig wouldn't understand because he just fixes things with his hands and then is done with the fixing.\n\nYou finish. You feel accomplished. You also feel slightly like Craig is going to say something when you get home. He's going to do the voice.`,
+    choices: [
+      { label: "Head back. Own it. You're a professional.", next: "kitchen" }
+    ]
+  },
+  phone_down: {
+    tag: "chapter two - growth",
+    text: `You put the phone down.\n\nYou drink your drink.\n\nYou watch two strangers argue about where to park. You watch a dog get briefly confused by a leaf. You exist, untethered, for a small window of time that is technically yours.\n\nThis is what Craig would call "not working on your birthday" and what you would call "an unreasonably high bar."\n\nBut okay. Fine. It's nice.`,
+    choices: [
+      { label: "Head back home.", next: "kitchen" }
+    ]
+  },
+  kitchen: {
+    tag: "chapter two - suspicious activity",
+    text: `Craig is in the kitchen. This is normal. What is not normal is the specific way he is standing, which can only be described as <em>guilty.</em>\n\n"Morning," he says.\n\n"Morning," you say.\n\nShoto goes directly to his bowl and begins staring at it with intent.\n\nSomething is happening here. You can feel it haphazardly unfolding in real time.`,
+    choices: [
+      { label: "Feed Shoto. He is a priority. He is always a priority.", next: "shotonoms" },
+      { label: "Stare at Craig until he cracks. He will crack.", next: "craiginvestigate" },
+      { label: "Pour coffee first. You need your faculties for whatever this is.", next: "coffee" }
+    ]
+  },
+  shotonoms: {
+    tag: "chapter two - the good boy protocol",
+    text: `You pour Shoto's food. He attacks it like a small chaotic soldier. His tail doesn't stop moving the entire time. He looks up at you mid-bite with an expression that is pure love and zero chill.\n\nHe has no concept of birthdays but he is celebrating anyway just by existing and being him and wearing his little outfit and breathing his little breaths.\n\nYou are going to be fine. Today is going to be good.`,
+    choices: [
+      { label: "Now. Craig. What's going on, Craig.", next: "craiginvestigate" }
+    ]
+  },
+  coffee: {
+    tag: "chapter two - tactical preparation",
+    text: `Smart. You pour the coffee. You take a sip. The clarity arrives.\n\nCraig is still doing the guilty stance. You don't know what it is yet but you're going to find out and you are now <em>caffeinated</em> for it.\n\nShoto has finished eating and is now sitting next to Craig, looking at you both, like a small furry mediator.`,
+    choices: [
+      { label: "Okay Craig. Talk.", next: "craiginvestigate" }
+    ]
+  },
+  craiginvestigate: {
+    tag: "chapter two - the confession",
+    text: `Craig does the thing where he starts explaining something before you've even fully asked. He bought himself a MacBook. Recently. And then also, separately, an Apple Pencil. In the last 48 hours.\n\n"It was for work," he says, which is technically true and also completely not the point.\n\nYou look at him. He looks at you. Shoto looks at both of you.\n\n"It's my birthday," you say.\n\n"...Yes," he says.\n\nHow do you proceed?`,
+    choices: [
+      { label: "Roast him. Methodically. With love but absolutely no mercy.", next: "roast" },
+      { label: "Let it go. You're in a good mood. He knows what he did.", next: "letitgo" },
+      { label: "Start mirroring everything he does and see how long until he loses it.", next: "mirror_start" }
+    ]
+  },
+  roast: {
+    tag: "chapter two - the reckoning",
+    text: `You look at him the way a financial advisor looks at an extremely poor investment decision.\n\n"A MacBook," you say.\n\n"It's for the homelab," he says.\n\n"And an Apple Pencil."\n\n"I needed it for—"\n\n"On my birthday."\n\nCraig opens his mouth. Craig closes his mouth. Shoto, sensing the energy, has left the room.\n\nEven the dog knows.`,
+    choices: [
+      { label: "Let him off the hook. You've made your point. He gets it.", next: "letitgo" },
+      { label: "Mirror everything he does now. As punishment. With love.", next: "mirror_start" }
+    ]
+  },
+  letitgo: {
+    tag: "chapter three - grace",
+    text: `You let it go. You are the bigger person. You have the emotional intelligence of someone who has, in fact, listened to a lot of Noah Kahan and processed some things.\n\nCraig visibly relaxes. He says something sincere. It might be clumsy but it's real, and you know the difference.\n\nShoto trots back in, having assessed the threat level as resolved.\n\nThe morning settles into something warm.`,
+    choices: [
+      { label: "Ask Craig to put on that mexican song.", next: "mexicansong" }
+    ]
+  },
+  mirror_start: {
+    tag: "chapter three - the technique",
+    text: `You start mirroring him.\n\nHe picks up his coffee mug. You pick up your coffee mug. Same angle. Same timing.\n\nHe shifts his weight to his left foot. You shift yours.\n\nHe looks at you. You look at him with exactly his expression.\n\nHe starts to say something. You start to say something.\n\nHe laughs.\n\nYou laugh the exact same laugh.`,
+    choices: [
+      { label: "He tries to stop laughing. Mirror the attempt.", next: "mirror2" }
+    ]
+  },
+  mirror2: {
+    tag: "chapter three - escalation",
+    text: `He's trying to hold it together. His mouth is doing that thing. You do the thing with your mouth.\n\nHe puts his hand over his face. You put your hand over your face.\n\nHe makes a noise that is not quite a laugh and not quite a word. You make the same noise.\n\nShoto is sitting between you both looking back and forth like he's at a tennis match.\n\nCraig gives up. He's fully gone. You're fully gone. The laugh loops. It always loops. It will loop until one of you leaves the room or falls down.`,
+    choices: [
+      { label: "Let it happen. This is what joy looks like. Let it run.", next: "mirror_end" }
+    ]
+  },
+  mirror_end: {
+    tag: "chapter three - the aftermath",
+    text: `Eventually it ends. It always eventually ends. You're both kind of wiped out from it. Shoto has climbed onto the couch and is watching you with patient judgment.\n\nCraig wipes his eyes. You wipe your eyes.\n\nThis has been happening for a decade. It never gets less funny. If anything it gets worse, which means it gets better.\n\nYou don't have a word for whatever that is. You don't need one.`,
+    choices: [
+      { label: "Ask Craig to put on that mexican song.", next: "mexicansong" }
+    ]
+  },
+  mexicansong: {
+    tag: "chapter four - the song",
+    text: `The song comes on.\n\nYou don't need to explain it to anyone. It doesn't need a title or a history or a context. It just is what it is, which is yours, which is the whole point.\n\nShoto has relocated to somewhere comfortable. Craig is right there. The morning light is doing that thing.\n\nYou've been doing this together for a long time. Long enough that some things don't need words anymore. Long enough that a song can just be called <em>that mexican song</em> and that's enough, that's everything, that's the whole story in three words.`,
+    choices: [
+      { label: "This is good. You want to draw something.", next: "drawing" },
+      { label: "Stay right here. Don't move. Just let this be the moment.", next: "ending_best" }
+    ]
+  },
+  drawing: {
+    tag: "chapter four - the lake",
+    text: `You find your sketchbook. There's something you want to get down - you're not sure what yet, just a shape or a feeling or something you saw recently that stuck.\n\nYou used to go to the lake and draw. You haven't in a while. You've been meaning to. Today is your birthday, which means today counts for something, which means maybe soon.\n\nFor now you're here, in the house, with the dog and the song and the man who bought himself two computers this week and is somehow still your favorite person.\n\nYou draw something. It starts haphazardly and becomes something real. It always does.`,
+    choices: [
+      { label: "Look up at Craig when you're done.", next: "ending_best" }
+    ]
+  },
+  ending_best: {
+    tag: "final chapter - true ending",
+    badge: "best",
+    badgeLabel: "true ending",
+    text: `There is no grand finale. There is no boss fight. The quest was never really about any of that.\n\nIt's Shoto in his outfit. It's the bird app at 7am. It's Craig doing something genuinely unhinged like buying electronics on your birthday and meaning well anyway, always meaning well.\n\nIt's that mexican song. It's the lake you'll go back to. It's Frieren on the TV and pepperoni pizza and Reese's and a sketchbook and a decade of m'gove said in a hundred different ways without always saying it out loud.\n\nYou have built something real. Something warm. Something that includes a dog who was adopted from Leon County Humane Society and has been the best resident of any home he's ever been in.\n\nThis is the quest. This is what you were looking for.\n\n<strong>m'gove, Heather. happy birthday.</strong>`,
+    choices: []
+  }
+};
+
+let depth = 0;
+
+function setDots(n) {
+  const dots = document.querySelectorAll('.progress-dot');
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i <= n);
+  });
+}
+
+function goto(id) {
+  const scene = SCENES[id];
+  if (!scene) return;
+  const box = document.getElementById('scene-box');
+
+  depth = Math.min(depth + 1, 5);
+  setDots(depth);
+
+  let html = `<div class="scene-tag">${scene.tag}</div>`;
+
+  if (scene.badge) {
+    html += `<div class="ending-badge ${scene.badge}">${scene.badgeLabel}</div>`;
+  }
+
+  const paras = scene.text.split('\n\n');
+  html += `<div class="scene-text">${paras.map(p => `<p style="margin-bottom:1rem">${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>`;
+
+  if (scene.choices && scene.choices.length > 0) {
+    html += `<div class="choices">`;
+    scene.choices.forEach(c => {
+      html += `<button class="choice-btn" onclick="goto('${c.next}')"><span class="arrow">&rsaquo;</span>${c.label}</button>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<button class="restart-btn" onclick="restart()">&#8635; play again</button>`;
+  }
+
+  box.innerHTML = html;
+  box.style.animation = 'none';
+  box.offsetHeight;
+  box.style.animation = 'fadeIn 0.4s ease both';
+}
+
+function restart() {
+  depth = 0;
+  setDots(0);
+  goto('start');
+}
+
+function makeStars() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `
+      left: ${Math.random()*100}%;
+      top: ${Math.random()*100}%;
+      --d: ${2 + Math.random()*4}s;
+      --delay: ${Math.random()*5}s;
+      --max-op: ${0.3 + Math.random()*0.6};
+      width: ${Math.random() > 0.8 ? 3 : 2}px;
+      height: ${Math.random() > 0.8 ? 3 : 2}px;
+    `;
+    container.appendChild(s);
+  }
+}
+
+makeStars();
+goto('start');
+</script>
+</body>
+</html>
