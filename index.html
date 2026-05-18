@@ -258,12 +258,78 @@
     opacity: 0;
   }
 
-  .footer span {
-    color: var(--pink);
+  .footer span { color: var(--pink); }
+
+  .music-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s;
+    opacity: 0.7;
+  }
+  .music-toggle:hover { opacity: 1; border-color: var(--accent); }
+
+  .cake-area {
+    text-align: center;
+    margin-top: 2rem;
+    animation: fadeIn 0.8s ease both;
+  }
+  .cake-area svg { max-width: 260px; width: 100%; }
+
+  .blow-btn {
+    display: inline-block;
+    margin-top: 1.25rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .blow-btn:hover { background: rgba(252,211,77,0.08); }
+
+  .blow-listening {
+    margin-top: 1rem;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    animation: pulse 1.2s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 999;
+    animation: confettiFall var(--dur) var(--delay) ease-in forwards;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 </style>
 </head>
 <body>
+
+<audio id="bgm" src="song1.mp3" loop></audio>
+<button class="music-toggle" id="music-btn" onclick="toggleMusic()" title="toggle music">🎵</button>
 
 <div class="stars" id="stars"></div>
 
@@ -295,7 +361,7 @@
 const SCENES = {
   start: {
     tag: "chapter one - the awakening",
-    text: `It is your birthday. The room is quiet. Shoto is already pressed against your legs, breathing in that ridiculous dog way that somehow sounds like snoring and contentment at the same time.\n\nYour phone is right there.\n\nYou already know what you're going to do. You've known since before you were even fully awake. It calls to you. It always calls to you.`,
+    text: `It is your birthday. The room is quiet. Shoto is in his dog bed right next to you, exactly where he always is, breathing in that ridiculous dog way that somehow sounds like snoring and contentment at the same time.\n\nYour phone is right there.\n\nYou already know what you're going to do. You've known since before you were even fully awake. It calls to you. It always calls to you.`,
     choices: [
       { label: "Open the bird app. Obviously. First thing. Every day. Always.", next: "birdapp" },
       { label: "Resist. Just for one birthday morning. Lay here like a normal person.", next: "resist" }
@@ -310,7 +376,7 @@ const SCENES = {
   },
   birdapp: {
     tag: "chapter one - the daily ritual",
-    text: `You open Finch. Your bird has needs. Your bird <em>always</em> has needs. You tend to them with the focus of someone managing a small but emotionally demanding portfolio.\n\nCraig is still asleep. Shoto has relocated to directly on top of your feet, which is illegal but also not something you're prepared to fight.\n\nYou finish your bird duties. You set the phone down. You feel, inexplicably, like you've accomplished something.\n\nShoto looks up at you. Today he is wearing the little outfit. You put it on him last night because you knew it would make the morning better, and you were right, and you are always right about Shoto.`,
+    text: `You open Finch. Your bird has needs. Your bird <em>always</em> has needs. You tend to them with the focus of someone managing a small but emotionally demanding portfolio.\n\nCraig is still asleep. Shoto has woken up and migrated from his dog bed to sitting directly beside you, doing his patient waiting thing.\n\nYou finish your bird duties. You set the phone down. You feel, inexplicably, like you've accomplished something.\n\nShoto looks up at you. Today he is wearing the little outfit. You put it on him last night because you knew it would make the morning better, and you were right, and you are always right about Shoto.`,
     choices: [
       { label: "Take approximately forty pictures of him in the outfit.", next: "shotopics" },
       { label: "Simply admire him for a moment. A serene birthday moment.", next: "shotoadmire" }
@@ -461,17 +527,155 @@ const SCENES = {
     tag: "final chapter - true ending",
     badge: "best",
     badgeLabel: "true ending",
+    cake: true,
     text: `There is no grand finale. There is no boss fight. The quest was never really about any of that.\n\nIt's Shoto in his outfit. It's the bird app at 7am. It's Craig doing something genuinely unhinged like buying electronics on your birthday and meaning well anyway, always meaning well.\n\nIt's that mexican song. It's the lake you'll go back to. It's Frieren on the TV and pepperoni pizza and Reese's and a sketchbook and a decade of m'gove said in a hundred different ways without always saying it out loud.\n\nYou have built something real. Something warm. Something that includes a dog who was adopted from Leon County Humane Society and has been the best resident of any home he's ever been in.\n\nThis is the quest. This is what you were looking for.\n\n<strong>m'gove, Heather. happy birthday.</strong>`,
     choices: []
   }
 };
 
 let depth = 0;
+let audioUnlocked = false;
+let isMuted = true;
+const bgm = document.getElementById('bgm');
+bgm.volume = 0.35;
+
+function toggleMusic() {
+  const btn = document.getElementById('music-btn');
+  if (isMuted) {
+    bgm.play().catch(()=>{});
+    isMuted = false;
+    btn.textContent = '🔊';
+  } else {
+    bgm.pause();
+    isMuted = true;
+    btn.textContent = '🎵';
+  }
+}
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  bgm.play().then(() => {
+    isMuted = false;
+    document.getElementById('music-btn').textContent = '🔊';
+  }).catch(()=>{});
+  document.removeEventListener('click', unlockAudio);
+}
+document.addEventListener('click', unlockAudio);
 
 function setDots(n) {
   const dots = document.querySelectorAll('.progress-dot');
-  dots.forEach((d, i) => {
-    d.classList.toggle('active', i <= n);
+  dots.forEach((d, i) => d.classList.toggle('active', i <= n));
+}
+
+function cakeLitSVG() {
+  const candles = [];
+  const positions = [60,90,120,150,200,230,260];
+  const colors = ['#f472b6','#c084fc','#fcd34d','#5eead4','#f472b6','#fcd34d','#c084fc'];
+  positions.forEach((x, i) => {
+    candles.push(`
+      <rect x="${x-4}" y="90" width="8" height="28" rx="2" fill="${colors[i]}" opacity="0.9"/>
+      <ellipse cx="${x}" cy="86" rx="5" ry="8" fill="#fcd34d" opacity="0.9" class="flame-${i}">
+        <animate attributeName="ry" values="8;10;7;9;8" dur="${0.4+i*0.07}s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="86;84;87;85;86" dur="${0.4+i*0.07}s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="${x}" cy="88" rx="3" ry="5" fill="#fff" opacity="0.5">
+        <animate attributeName="ry" values="5;7;4;6;5" dur="${0.4+i*0.07}s" repeatCount="indefinite"/>
+      </ellipse>
+    `);
+  });
+  return `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+    ${candles.join('')}
+    <rect x="20" y="118" width="280" height="50" rx="8" fill="#c084fc" opacity="0.85"/>
+    <rect x="20" y="118" width="280" height="16" rx="0" fill="#a855f7" opacity="0.5"/>
+    <rect x="10" y="165" width="300" height="48" rx="10" fill="#f0abfc" opacity="0.9"/>
+    <rect x="10" y="165" width="300" height="14" rx="0" fill="#e879f9" opacity="0.5"/>
+    <text x="160" y="197" text-anchor="middle" font-family="Playfair Display, serif" font-size="15" fill="#4a1c6e" font-style="italic">happy birthday heather</text>
+    <text x="160" y="148" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f0e6ff" opacity="0.8">36</text>
+  </svg>`;
+}
+
+function cakeBlownSVG() {
+  const candles = [];
+  const positions = [60,90,120,150,200,230,260];
+  const colors = ['#f472b6','#c084fc','#fcd34d','#5eead4','#f472b6','#fcd34d','#c084fc'];
+  positions.forEach((x, i) => {
+    candles.push(`
+      <rect x="${x-4}" y="90" width="8" height="28" rx="2" fill="${colors[i]}" opacity="0.7"/>
+      <path d="M${x} 85 Q${x+4} 78 ${x+2} 70 Q${x+6} 63 ${x} 58" stroke="#9b8ec4" stroke-width="1.5" fill="none" opacity="0.6">
+        <animate attributeName="d" values="M${x} 85 Q${x+4} 78 ${x+2} 70 Q${x+6} 63 ${x} 58;M${x} 85 Q${x-3} 77 ${x+1} 69 Q${x-2} 62 ${x+2} 57;M${x} 85 Q${x+4} 78 ${x+2} 70 Q${x+6} 63 ${x} 58" dur="1s" repeatCount="indefinite"/>
+      </path>
+    `);
+  });
+  return `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+    ${candles.join('')}
+    <rect x="20" y="118" width="280" height="50" rx="8" fill="#c084fc" opacity="0.85"/>
+    <rect x="20" y="118" width="280" height="16" rx="0" fill="#a855f7" opacity="0.5"/>
+    <rect x="10" y="165" width="300" height="48" rx="10" fill="#f0abfc" opacity="0.9"/>
+    <rect x="10" y="165" width="300" height="14" rx="0" fill="#e879f9" opacity="0.5"/>
+    <text x="160" y="197" text-anchor="middle" font-family="Playfair Display, serif" font-size="15" fill="#4a1c6e" font-style="italic">happy birthday heather</text>
+    <text x="160" y="148" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f0e6ff" opacity="0.8">36</text>
+  </svg>`;
+}
+
+function launchConfetti() {
+  const colors = ['#f472b6','#c084fc','#fcd34d','#5eead4','#f0abfc','#fcd34d'];
+  for (let i = 0; i < 80; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left: ${Math.random()*100}vw;
+      top: -10px;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      --dur: ${1.5 + Math.random()*2}s;
+      --delay: ${Math.random()*1.2}s;
+      transform: rotate(${Math.random()*360}deg);
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+}
+
+function startBlowDetection() {
+  const statusEl = document.getElementById('blow-status');
+  const cakeEl = document.getElementById('cake-svg');
+  statusEl.textContent = '🎤 listening... give it a good blow';
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    src.connect(analyser);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    let blowFrames = 0;
+
+    function check() {
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((a,b) => a+b, 0) / data.length;
+      if (avg > 28) {
+        blowFrames++;
+        if (blowFrames > 10) {
+          stream.getTracks().forEach(t => t.stop());
+          ctx.close();
+          cakeEl.innerHTML = cakeBlownSVG();
+          statusEl.textContent = '🎉 make a wish!';
+          launchConfetti();
+          return;
+        }
+      } else {
+        blowFrames = Math.max(0, blowFrames - 1);
+      }
+      requestAnimationFrame(check);
+    }
+    check();
+  }).catch(() => {
+    statusEl.textContent = 'mic not available - just pretend you blew them out 💨';
+    setTimeout(() => {
+      document.getElementById('cake-svg').innerHTML = cakeBlownSVG();
+      launchConfetti();
+    }, 1800);
   });
 }
 
@@ -498,6 +702,18 @@ function goto(id) {
       html += `<button class="choice-btn" onclick="goto('${c.next}')"><span class="arrow">&rsaquo;</span>${c.label}</button>`;
     });
     html += `</div>`;
+  } else if (scene.cake) {
+    html += `<div class="cake-area">
+      <div id="cake-svg">${cakeLitSVG()}</div>
+      <button class="blow-btn" onclick="this.style.display='none';startBlowDetection()">🎂 blow out the candles</button>
+      <div class="blow-listening" id="blow-status" style="display:none"></div>
+    </div>
+    <button class="restart-btn" onclick="restart()" style="margin-top:1.5rem">&#8635; play again</button>`;
+    setTimeout(() => {
+      document.querySelector('.blow-btn')?.addEventListener('click', function() {
+        document.getElementById('blow-status').style.display = 'block';
+      });
+    }, 100);
   } else {
     html += `<button class="restart-btn" onclick="restart()">&#8635; play again</button>`;
   }
