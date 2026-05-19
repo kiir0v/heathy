@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>shoto's story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0f0a;
+    --surface: #121a12;
+    --border: #2a4a2a;
+    --text: #e8f5e8;
+    --muted: #7aaa7a;
+    --accent: #86efac;
+    --accent2: #bbf7d0;
+    --gold: #fcd34d;
+    --pink: #f472b6;
+    --teal: #5eead4;
+    --warm: #fed7aa;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--d, 3s) var(--delay, 0s) infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; }
+    50% { opacity: var(--max-op, 0.6); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    width: 100%;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .header .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scene {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scene-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+
+  .scene-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  .scene-text em { color: var(--gold); font-style: italic; }
+  .scene-text strong { color: var(--accent2); font-style: normal; }
+  .scene-text .thought {
+    display: block;
+    margin: 0.75rem 0;
+    padding: 0.75rem 1rem;
+    background: rgba(134, 239, 172, 0.06);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    font-size: 1rem;
+    color: var(--accent2);
+    font-style: italic;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .choice-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 0.85rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent);
+    background: rgba(134, 239, 172, 0.06);
+    color: var(--accent2);
+    transform: translateX(4px);
+  }
+
+  .choice-btn .arrow { color: var(--accent); margin-right: 8px; }
+
+  .ending-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    background: rgba(187, 247, 208, 0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(187, 247, 208, 0.3);
+  }
+
+  .restart-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 0.6rem 1.25rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .restart-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .progress-dots { display: flex; gap: 4px; }
+
+  .progress-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .progress-dot.active { background: var(--accent); }
+
+  .footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 11px;
+    color: var(--muted);
+    animation: fadeIn 1s 0.5s ease both;
+    opacity: 0;
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .footer a:hover { text-decoration: underline; }
+
+  .music-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s;
+    opacity: 0.7;
+  }
+  .music-toggle:hover { opacity: 1; border-color: var(--accent); }
+
+  .paw {
+    display: inline-block;
+    animation: pawbounce 2s ease infinite;
+  }
+  @keyframes pawbounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+</style>
+</head>
+<body>
+
+<audio id="bgm" src="song2.mp3" loop></audio>
+<button class="music-toggle" id="music-btn" onclick="toggleMusic()" title="toggle music">🐾</button>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="header">
+    <p class="eyebrow">a secret chapter</p>
+    <h1>Shoto's Story</h1>
+    <p class="subtitle">the same morning, from a more important perspective</p>
+  </div>
+
+  <div class="progress">
+    <span>progress</span>
+    <div class="progress-dots" id="dots">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+
+  <div class="scene" id="scene-box"></div>
+
+  <div class="footer">
+    <span class="paw">🐾</span> &nbsp;
+    <a href="/">back to heather.quest</a>
+    &nbsp; <span class="paw">🐾</span>
+  </div>
+</div>
+
+<script>
+const SCENES = {
+  start: {
+    tag: "dawn - the dog bed",
+    text: `My name is Shoto.\n\nI live here. This is my house. That is my mom. She is sleeping. I am in my bed which is right next to her side of the bed, which is the correct and only acceptable location for my bed, and I have been watching her sleep for approximately forty five minutes.\n\n<span class="thought">she's going to wake up soon. i can feel it. i am ready.</span>\n\nI do not know what day it is. I do not have a concept of days. I only know: there is my mom, there is the possibility of treats, and everything else is noise.`,
+    choices: [
+      { label: "Continue watching mom sleep. Patiently. With intense focus.", next: "watching" },
+      { label: "Make a small noise. Just to see.", next: "small_noise" }
+    ]
+  },
+  small_noise: {
+    tag: "dawn - the noise",
+    text: `I make a small noise.\n\nMom stirs. She does not wake up. She pulls the blanket slightly.\n\n<span class="thought">noted. different approach required.</span>\n\nI return to watching her. I am patient. I am a professional.`,
+    choices: [
+      { label: "Continue watching. The time will come.", next: "watching" }
+    ]
+  },
+  watching: {
+    tag: "morning - the awakening",
+    text: `She wakes up.\n\nI stand up immediately. My tail begins. I did not tell my tail to begin but it has begun and it is not stopping.\n\nShe reaches for her phone. She does the bird app. I know about the bird app. The bird app takes approximately forever and I sit directly next to her and wait with my whole body.\n\n<span class="thought">she is looking at a phone and not at me. this is a temporary situation.</span>\n\nEventually she looks at me. Her whole face does the thing.\n\nI have won.`,
+    choices: [
+      { label: "Accept the pets. Bask in them.", next: "couch" }
+    ]
+  },
+  couch: {
+    tag: "morning - the couch",
+    text: `We go downstairs. This is the best part of the morning, which makes it the best part of the day, which makes it the best part of my life.\n\nWe sit on the couch together. Mom and the tall one. I am between them, which is where I belong, and I am pressed against mom specifically because mom is my person and I want her to know that I know that and she should also know that I know that she knows.\n\n<span class="thought">this is good. i am good. everything is good.</span>\n\nI am so comfortable I could stay here forever. I will stay here forever. Nothing could move me from this couch.\n\nAnd then.\n\nA thought arrives.`,
+    choices: [
+      { label: "The thought arrives. It is about treats.", next: "treat_revelation" }
+    ]
+  },
+  treat_revelation: {
+    tag: "morning - the revelation",
+    text: `<span class="thought">treats.</span>\n\nI get off the couch.\n\nI stand in front of mom. I stare at her. She is looking at the tall one and talking. I continue staring. I add a small sound. A polite sound. A completely reasonable sound made by a dog who simply has needs.\n\nThe tall one looks at me.\n\n"Shoto," he says. "No. It's your mom's birthday. Not yours."\n\n<span class="thought">i don't know what birthday means. i know what 'no' means. i disagree with 'no'.</span>\n\nI look back at mom. She is my favorite. She will understand.`,
+    choices: [
+      { label: "Stare at mom harder.", next: "stare_harder" },
+      { label: "Add more whining. For clarity.", next: "whining" }
+    ]
+  },
+  stare_harder: {
+    tag: "morning - escalation",
+    text: `I stare at her with everything I have. I put my whole self into it. I am communicating, I am projecting, I am transmitting the information directly from my brain into hers via eye contact alone.\n\nThe information is: <em>treats.</em>\n\nMom looks at me. She makes a face that means she thinks I'm funny, which is not what I was going for but I'll take it.\n\n<span class="thought">she's going to give me a treat. i can feel it. any second now.</span>`,
+    choices: [
+      { label: "Add whining to the staring. A multimedia approach.", next: "whining" }
+    ]
+  },
+  whining: {
+    tag: "morning - the campaign",
+    text: `I whine.\n\nNot a big whine. A small, specific, informational whine. A whine that says: <em>I am aware that you know what I want and I am simply providing a gentle reminder.</em>\n\nMom laughs. The tall one shakes his head. I continue.\n\nI have been doing this for several minutes. My position has not changed. My commitment has not wavered. Some might call this stubborn. I call it thorough.\n\n<span class="thought">she's my favorite human. she's going to give me a treat. this is simply a matter of time.</span>`,
+    choices: [
+      { label: "Wait. She will come around. She always comes around.", next: "nosebalm" }
+    ]
+  },
+  nosebalm: {
+    tag: "morning - the ritual",
+    text: `Mom gets up.\n\nThis could mean anything. I follow her immediately because that is the correct response to mom getting up.\n\nShe gets the nose balm.\n\nI know about the nose balm. The nose balm happens every morning. I sit very still for the nose balm because I am a good boy and also because I know what comes after the nose balm.\n\nShe puts it on my nose. It is cold. I do not move.\n\n<span class="thought">the treat is coming. it is coming. here it comes. it's almost here. it's—</span>\n\nThe dental treat arrives.\n\nIt is green. It is mine. I eat it in approximately one and a half seconds and look up immediately in case there is another one.\n\nThere is not another one.\n\n<span class="thought">there should be another one.</span>`,
+    choices: [
+      { label: "Accept the one treat with grace. (Begin planning for tomorrow's campaign.)", next: "harness" }
+    ]
+  },
+  harness: {
+    tag: "morning - the harness",
+    text: `Mom gets the harness.\n\nI lose my mind a little bit. Just a little. Just a completely reasonable amount for a dog who is about to go outside.\n\nShe puts it on me. I assist by moving around too much. She is patient. She always puts my harness on in the morning and I react like this every single time because every single time it is the greatest news I have ever received.\n\nWe go to the stop sign and back.\n\nI smell everything. There is a lot to smell. The world is full of information and I am collecting all of it. Mom walks next to me and I check on her every few steps to make sure she is still there, which she always is, which is always a relief.\n\n<span class="thought">she's still there. good. she's still there. good. she's still—</span>\n\nShe's still there. Good.`,
+    choices: [
+      { label: "Return home. The walk is over. Life is beautiful.", next: "getting_ready" }
+    ]
+  },
+  getting_ready: {
+    tag: "morning - the shadow",
+    text: `Mom goes upstairs.\n\nI follow her.\n\nShe goes into the bathroom.\n\nI wait outside the bathroom. This is important. Someone needs to be here when she comes out and I have volunteered.\n\nShe comes out. I follow her to the bedroom. She gets clothes. I watch. She does the things she does in the morning. I watch all of it. I am very helpful.\n\n<span class="thought">wherever she goes i will also go. this is my policy.</span>\n\nAt some point the tall one goes to the front door. I briefly consider this. The front door sometimes means a walk, which means treats, which is relevant to my interests.\n\nI go to the front door. I tell the tall one goodbye. He says goodbye back and I think he means it.\n\nI return to following mom.`,
+    choices: [
+      { label: "Follow mom until the very last possible second.", next: "she_leaves" }
+    ]
+  },
+  she_leaves: {
+    tag: "morning - the departure",
+    text: `She goes to the door.\n\nI follow her to the door. She puts on her shoes. I sit and watch. She gets her things. She looks at me.\n\nShe says goodbye to me in the way she says goodbye to me, which is the specific way only she says it, which I would recognize from any distance in any room in any situation.\n\nShe leaves.\n\nThe door closes.\n\n<span class="thought">.</span>\n\nI sit at the door for a moment. This is normal. I do this every morning. She always comes back. I know she always comes back. This is a factual and established pattern.\n\nI go find my bed anyway.`,
+    choices: [
+      { label: "Find the best bed. Begin the waiting.", next: "sleeping" }
+    ]
+  },
+  sleeping: {
+    tag: "the long middle - the wait",
+    text: `I sleep.\n\nI move to a different bed. I sleep there.\n\nI move to the downstairs couch. I sleep there too. This is the good couch. I am not supposed to be on the good couch. I am on the good couch.\n\nI snore. I snore quite a lot. I have been told this. I do not apologize for it.\n\n<span class="thought">mom.</span>\n\nI dream. I don't know what I dream about. But I know that when I wake up, the first thing I think of is her. This has always been true. I think it will always be true.\n\nThe tall one checks on me sometimes. He gives me water. He is fine. I tolerate him. He was the one who brought me home, actually, so I have some fondness for him that I express by occasionally sitting next to him and letting him pet me.\n\nBut he is not mom.\n\n<span class="thought">nobody is mom.</span>`,
+    choices: [
+      { label: "Continue waiting. She always comes back.", next: "she_returns" }
+    ]
+  },
+  she_returns: {
+    tag: "evening - the best part",
+    badge: true,
+    text: `The door opens.\n\nI am awake before the sound finishes. I am at the door before she is through it. My tail has achieved something close to liftoff.\n\nShe is here. She came back. She always comes back and yet every single time it is the best thing that has ever happened to me.\n\nShe kneels down. I put my face in her hands. She says my name. I have heard my name thousands of times and it still does something to me every single time she says it specifically.\n\n<span class="thought">she came back. she came back. she always comes back.</span>\n\nI was at the Leon County Humane Society for a while before this. Some people had me before that too. I don't remember all of it. Someone once told my current people that I wasn't treat motivated, which I understand because around those people I probably wasn't.\n\nBut here I am. And here she is. And I have been treat motivated every single day of my life in this house and I will continue to be for as long as I live.\n\n<strong>happy birthday, mom. you're my favorite human. you've always been my favorite human. this was never a competition.</strong>`,
+    choices: []
+  }
+};
+
+let audioUnlocked = false;
+let isMuted = true;
+const bgm = document.getElementById('bgm');
+bgm.volume = 0.35;
+
+function toggleMusic() {
+  const btn = document.getElementById('music-btn');
+  if (isMuted) {
+    bgm.play().catch(()=>{});
+    isMuted = false;
+    btn.textContent = '🐾';
+    btn.style.opacity = '1';
+  } else {
+    bgm.pause();
+    isMuted = true;
+    btn.textContent = '🐾';
+    btn.style.opacity = '0.4';
+  }
+}
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  bgm.play().then(() => {
+    isMuted = false;
+    const btn = document.getElementById('music-btn');
+    btn.textContent = '🐾';
+    btn.style.opacity = '1';
+  }).catch(()=>{});
+  document.removeEventListener('click', unlockAudio);
+}
+document.addEventListener('click', unlockAudio);
+
+let depth = 0;
+
+function setDots(n) {
+  const dots = document.querySelectorAll('.progress-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i <= n));
+}
+
+function goto(id) {
+  const scene = SCENES[id];
+  if (!scene) return;
+  const box = document.getElementById('scene-box');
+
+  depth = Math.min(depth + 1, 6);
+  setDots(depth);
+
+  let html = `<div class="scene-tag">${scene.tag}</div>`;
+
+  if (scene.badge) {
+    html += `<div class="ending-badge">🐾 true ending</div>`;
+  }
+
+  const paras = scene.text.split('\n\n');
+  html += `<div class="scene-text">${paras.map(p => `<p style="margin-bottom:1rem">${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>`;
+
+  if (scene.choices && scene.choices.length > 0) {
+    html += `<div class="choices">`;
+    scene.choices.forEach(c => {
+      html += `<button class="choice-btn" onclick="goto('${c.next}')"><span class="arrow">&rsaquo;</span>${c.label}</button>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<button class="restart-btn" onclick="restart()">&#8635; read again</button>`;
+  }
+
+  box.innerHTML = html;
+  box.style.animation = 'none';
+  box.offsetHeight;
+  box.style.animation = 'fadeIn 0.4s ease both';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  depth = 0;
+  setDots(0);
+  goto('start');
+}
+
+function makeStars() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `
+      left: ${Math.random()*100}%;
+      top: ${Math.random()*100}%;
+      --d: ${2 + Math.random()*4}s;
+      --delay: ${Math.random()*5}s;
+      --max-op: ${0.2 + Math.random()*0.5};
+      width: ${Math.random() > 0.8 ? 3 : 2}px;
+      height: ${Math.random() > 0.8 ? 3 : 2}px;
+    `;
+    container.appendChild(s);
+  }
+}
+
+makeStars();
+goto('start');
+</script>
+</body>
+</html>
