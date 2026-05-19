@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>happy birthday forever</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink: #f472b6;
+    --purple: #c084fc;
+    --gold: #fcd34d;
+    --teal: #5eead4;
+    --green: #86efac;
+  }
+
+  body {
+    background: #0a0010;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .wallpaper {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.18;
+  }
+
+  .wall-row {
+    white-space: nowrap;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 2;
+    animation: scrollLeft 18s linear infinite;
+    color: transparent;
+  }
+
+  .wall-row:nth-child(even) {
+    animation: scrollRight 22s linear infinite;
+  }
+
+  .wall-row:nth-child(3n) { animation-duration: 15s; }
+  .wall-row:nth-child(4n) { animation-duration: 25s; }
+
+  @keyframes scrollLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes scrollRight {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+  }
+
+  .c0 { -webkit-text-stroke: 1px var(--pink); }
+  .c1 { -webkit-text-stroke: 1px var(--purple); }
+  .c2 { -webkit-text-stroke: 1px var(--gold); }
+  .c3 { -webkit-text-stroke: 1px var(--teal); }
+  .c4 { -webkit-text-stroke: 1px var(--green); }
+
+  .main {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    gap: 2rem;
+  }
+
+  .title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 8vw, 5rem);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--pink), var(--purple), var(--gold), var(--teal), var(--pink));
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+    filter: drop-shadow(0 0 30px rgba(240, 171, 252, 0.4));
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: rgba(240, 230, 255, 0.5);
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  .video-wrapper {
+    width: 100%;
+    max-width: 720px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(192, 132, 252, 0.3),
+      0 0 40px rgba(192, 132, 252, 0.2),
+      0 0 80px rgba(244, 114, 182, 0.1);
+    animation: glowPulse 3s ease infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgba(192,132,252,0.3), 0 0 40px rgba(192,132,252,0.2), 0 0 80px rgba(244,114,182,0.1); }
+    50% { box-shadow: 0 0 0 1px rgba(240,171,252,0.5), 0 0 60px rgba(240,171,252,0.3), 0 0 120px rgba(244,114,182,0.2); }
+  }
+
+  video {
+    width: 100%;
+    display: block;
+  }
+
+  .footer {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    color: rgba(240, 230, 255, 0.3);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .footer a {
+    color: rgba(192, 132, 252, 0.5);
+    text-decoration: none;
+  }
+  .footer a:hover { color: rgba(192, 132, 252, 0.9); }
+</style>
+</head>
+<body>
+
+<div class="wallpaper" id="wallpaper"></div>
+
+<div class="main">
+  <div class="title">happy birthday forever</div>
+  <div class="subtitle">and ever and ever and ever</div>
+
+  <div class="video-wrapper">
+    <video controls autoplay playsinline>
+      <source src="mov1.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="footer"><a href="/credits">back to heather.quest</a></div>
+</div>
+
+<script>
+const colors = ['c0','c1','c2','c3','c4'];
+const wall = document.getElementById('wallpaper');
+const text = 'happy birthday forever \u00a0\u00a0\u00a0 ';
+const repeated = text.repeat(20);
+
+for (let i = 0; i < 30; i++) {
+  const row = document.createElement('div');
+  row.className = `wall-row ${colors[i % colors.length]}`;
+  row.textContent = repeated + repeated;
+  wall.appendChild(row);
+}
+</script>
+</body>
+</html>
